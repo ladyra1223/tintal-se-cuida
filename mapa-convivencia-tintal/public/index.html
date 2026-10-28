@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="description" content="Consulta histórica de 62 registros asociados a riñas suministrados para el proyecto académico de El Tintal.">
+  <title>Tintal se Cuida - Mapa de alertas de Convivencia</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <script defer src="data.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script defer src="leaflet-heat.js"></script>
+  <script defer src="simulation-data.js"></script>
+  <script defer src="map.js"></script>
+</head>
+<body>
+  <header class="topbar"><div class="topbar-inner"><a class="brand" href="#inicio"><span class="brand-mark" aria-hidden="true">◎</span> Tintal se Cuida</a><span class="project-label">Proyecto académico</span></div></header>
+  <main id="inicio" class="page">
+    <section class="intro" aria-labelledby="page-title"><p class="eyebrow">KENNEDY · BOGOTÁ</p><h1 id="page-title">Tintal se Cuida</h1><p class="subtitle">Mapa de alertas de Convivencia</p><p>El Tintal · Consulta histórica de registros asociados a riñas. Explora los registros por año, día de la semana y franja horaria.</p></section>
+    <section class="card filter-card" aria-labelledby="filter-title">
+      <h2 id="filter-title">Filtrar registros</h2>
+      <form id="filters" class="filter-grid">
+        <label>Año<select id="year" name="year"><option value="all">Todos</option></select></label>
+        <label>Día de la semana<select id="day" name="day"><option value="all">Todos</option><option value="0">Lunes</option><option value="1">Martes</option><option value="2">Miércoles</option><option value="3">Jueves</option><option value="4">Viernes</option><option value="5">Sábado</option><option value="6">Domingo</option></select></label>
+        <label>Franja horaria<select id="band" name="band"><option value="all">Todas</option><option value="0">Madrugada · 00:00–05:59</option><option value="1">Mañana · 06:00–11:59</option><option value="2">Tarde · 12:00–17:59</option><option value="3">Noche · 18:00–23:59</option></select></label>
+        <button class="button" type="reset">Limpiar filtros</button>
+      </form>
+    </section>
+    <section class="card summary" aria-label="Resultado de la consulta" aria-live="polite" aria-atomic="true"><strong id="count" class="count">—</strong><div><h2>registros seleccionados</h2><p>de <span id="available">62</span> registros disponibles</p><p id="selection" class="selection">Todos los años · Todos los días · Todas las franjas</p></div></section>
+    <p id="empty-message" class="notice" role="status" hidden>No hay registros para los filtros seleccionados.</p>
+    <p id="data-error" class="notice error" role="alert" hidden>No se pudieron cargar los datos. Revisa data.js y vuelve a cargar la página.</p>
+    <section class="card map-card" aria-labelledby="map-title"><div class="section-heading"><div><h2 id="map-title">Mapa simulado de convivencia</h2><p>445 eventos sintéticos · Zonas Z1 a Z10</p></div><button id="map-reset" class="button" type="button" disabled>Volver a El Tintal</button></div>
+      <p class="notice"><strong>MAPA SIMULADO.</strong> Los 445 eventos, sus ubicaciones, fechas e índices son ficticios y provienen del prototipo. No representan los 62 registros reales del Excel ni hechos comprobados. Los filtros de arriba solo actualizan el contador y las dos gráficas de los 62 registros.</p>
+      <div class="simulation-kpis" aria-label="Totales exclusivos de la simulación"><div><strong id="simulation-total">—</strong><span>eventos simulados cargados</span></div><div><strong id="simulation-zone-count">—</strong><span>zonas simuladas</span></div></div>
+      <p class="caption">Los puntos pueden superponerse o quedar fuera de la vista al acercar. El total cargado es 445, aunque no se distingan todos a simple vista. Este total es independiente de los 62 registros reales.</p>
+      <p id="map-status" class="map-status" role="status">Cargando mapa simulado…</p>
+      <div class="simulation-layout"><div id="map" aria-label="Mapa simulado de 445 eventos en El Tintal, independiente de los registros reales" tabindex="0"></div>
+      <aside class="zone-panel" aria-labelledby="zone-panel-title" aria-live="polite"><p class="eyebrow">DEMOSTRACIÓN · DATOS SIMULADOS</p><h3 id="zone-panel-title">Detalle de zona <span id="zone-id">—</span></h3><strong id="zone-count" class="zone-count">—</strong><p>eventos ficticios en esta zona</p><dl><dt>Participación en los 445</dt><dd id="zone-share">—</dd><dt>Nivel del modelo</dt><dd id="zone-level">—</dd><dt>Índice del modelo original</dt><dd id="zone-index">—</dd></dl><p id="zone-description">Selecciona una zona.</p><p class="caption">Índice y nivel ficticios del prototipo. No indican riesgo comprobado ni predicción. Selecciona otra zona en el mapa o en los botones inferiores.</p></aside></div>
+      <p class="caption">Los filtros no modifican este mapa simulado. Usa el control de capas para mostrar u ocultar calor, puntos y zonas; selecciona un punto o una zona para consultar su detalle.</p>
+      <p class="caption">Referencia verificada: <a href="https://www.biblored.gov.co/bibliotecas/biblioteca-tintal" target="_blank" rel="noopener noreferrer">Biblioteca Pública Manuel Zapata Olivella – El Tintal</a>. No representa un lugar de ocurrencia. También se muestran CAI Tintal y Tintal Plaza con las posiciones del prototipo, pendientes de verificación. Ninguna referencia implica ocurrencia de riñas.</p>
+    </section>
+    <section class="card about" aria-labelledby="sim-zones-title"><h2 id="sim-zones-title">Zonas del escenario simulado</h2><p>Selecciona una zona para centrar el mapa y consultar su cantidad simulada.</p><div id="simulation-zones" class="simulation-zones"></div><p id="simulation-detail" class="caption" aria-live="polite">Total del escenario: 445 eventos simulados. Ninguna zona está vinculada a los 62 registros reales.</p><p class="caption">El calor representa concentración visual de puntos simulados, con el mismo peso para cada evento. Sus colores cambian con el zoom y no representan probabilidades ni riesgo comprobado.</p></section>
+    <section class="charts-grid" aria-label="Distribución de los registros seleccionados">
+      <article class="card chart-card"><h2>Registros por día de la semana</h2><p class="chart-subtitle">Número de registros</p><div id="days-chart" class="chart"></div><p class="caption">Las gráficas corresponden a los filtros seleccionados.</p></article>
+      <article class="card chart-card"><h2>Registros por franja horaria</h2><p class="chart-subtitle">Número de registros</p><div id="bands-chart" class="chart"></div><p class="caption">Madrugada 00–05 · Mañana 06–11 · Tarde 12–17 · Noche 18–23</p></article>
+    </section>
+    <section class="card about" aria-labelledby="about-title"><h2 id="about-title">Sobre los datos</h2><p>Fuente: archivo <strong>riñas.xlsx</strong> suministrado para el proyecto.</p><div class="coverage"><p><strong>2024</strong><span>19 registros · oct–dic</span></p><p><strong>2025</strong><span>19 registros · jul–sep</span></p><p><strong>2026</strong><span>24 registros · ene–mar</span></p></div><p class="caption">Los períodos son parciales. Son registros asociados a riñas, no necesariamente hechos únicos. La base identifica Kennedy y no incluye direcciones ni coordenadas específicas; su selección para el estudio de El Tintal fue indicada por el solicitante.</p><p class="caption">Esta herramienta describe antecedentes; no predice incidentes futuros. Los datos permanecen fijos hasta una actualización del sitio.</p></section>
+    <section class="card about" aria-labelledby="credits-title"><h2 id="credits-title">Autores del proyecto</h2><p>Leidy Vanessa Rojas<br>Carlos Julián Rodriguez<br>Katherine Alexandra Rivas</p></section>
+    <noscript><p class="notice error">Activa JavaScript para utilizar los filtros, las gráficas y el mapa.</p></noscript>
+  </main>
+  <footer>Tintal se Cuida - Mapa de alertas de Convivencia · Proyecto académico</footer>
+</body>
+</html>

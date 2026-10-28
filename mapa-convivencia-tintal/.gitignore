@@ -1,0 +1,19 @@
+# Nunca incorporar credenciales ni documentos fuente del cliente.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.xlsx
+*.xls
+*.docx
+*.pdf
+*.zip
+insumos/
+originales/
+qa/
+node_modules/
+.wrangler/
+.DS_Store
+Thumbs.db
+*.log
