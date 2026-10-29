@@ -23,6 +23,7 @@
       return;
     }
     const map = L.map(container, {scrollWheelZoom: false}).setView(CONFIG.center, CONFIG.zoom);
+    window.__simMap = map;
     const tiles = L.tileLayer(CONFIG.tileUrl, {minZoom: 12, maxZoom: 19, referrerPolicy: 'strict-origin-when-cross-origin', attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'});
     let loaded = false, failed = false;
     const timer = window.setTimeout(() => { if (!loaded) { status.hidden = false; status.textContent = 'El fondo está tardando en cargar. Comprueba la conexión; las estadísticas siguen disponibles.'; } }, 12000);
@@ -84,5 +85,12 @@
     reset.disabled = false;
     reset.addEventListener('click', () => { map.closePopup(); map.setView(CONFIG.center, CONFIG.zoom); });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+  // Inicialización diferida: el mapa se crea sólo cuando la pestaña Simulación es visible
+  // (evita que la capa de calor se dibuje sobre un contenedor de tamaño 0).
+  let started = false;
+  window.__initSimMap = function () {
+    if (started) { if (window.__simMap) { try { window.__simMap.invalidateSize(); } catch (e) {} } return; }
+    started = true;
+    init();
+  };
 })();

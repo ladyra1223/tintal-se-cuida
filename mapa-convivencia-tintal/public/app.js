@@ -203,6 +203,7 @@ function mostrarTab(name){
   $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
   $$('.panel').forEach(p=>p.classList.toggle('active',p.id===name));
   window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='simulacion'){setTimeout(()=>{if(window.__initSimMap)window.__initSimMap();},80);}
 }
 function initTabs(){
   $$('.tab').forEach(t=>t.addEventListener('click',()=>mostrarTab(t.dataset.tab)));

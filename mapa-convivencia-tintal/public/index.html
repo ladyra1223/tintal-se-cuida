@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tintal se Cuida · Mapa de alertas de convivencia</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <style>
 :root{
   --verde:#14532D;        /* primario */
@@ -176,6 +177,30 @@ select:focus,input:focus{outline:2px solid var(--verde2);outline-offset:-1px;bor
 .bandeja-vacia{text-align:center;color:var(--texto-cl);font-size:13px;padding:26px 12px;font-style:italic}
 .sim-tag{background:#FEF3C7;border:1px solid #FCD34D;color:#92400e;font-size:11px;font-weight:600;padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:7px;margin-bottom:14px}
 
+/* ---------- SIMULACIÓN (mapa Leaflet) ---------- */
+.sim-layout{display:grid;grid-template-columns:1fr 290px;gap:16px;align-items:start}
+#map{height:460px;width:100%;border-radius:10px;border:1px solid var(--borde);z-index:0;background:#EEF1F4}
+#map.map-unavailable{display:flex;align-items:center;justify-content:center;text-align:center;color:var(--texto-cl);font-size:13px;padding:20px}
+.map-status{font-size:12px;color:var(--texto-cl);background:var(--verde-cl);border-radius:8px;padding:9px 12px;margin-bottom:12px}
+.simulation-kpis{display:flex;gap:12px;margin-bottom:14px}
+.simulation-kpis>div{flex:1;background:var(--card);border:1px solid var(--borde);border-left:4px solid var(--dorado);border-radius:10px;padding:11px 14px}
+.simulation-kpis strong{display:block;font-size:22px;font-weight:800;color:var(--verde);line-height:1}
+.simulation-kpis span{font-size:11.5px;color:var(--texto-cl)}
+.zone-panel{background:var(--verde-cl);border-radius:10px;padding:16px;border:1px solid #D6E4DB}
+.zone-panel .eyebrow{font-size:10px;font-weight:700;letter-spacing:.6px;color:var(--dorado);text-transform:uppercase}
+.zone-panel h3{font-size:14px;color:var(--verde);margin:4px 0 8px}
+.zone-panel .zone-count{font-size:28px;font-weight:800;color:var(--verde);line-height:1}
+.zone-panel dl{margin:12px 0 0;font-size:12.5px}
+.zone-panel dt{color:var(--texto-cl);margin-top:8px}
+.zone-panel dd{font-weight:700;color:var(--texto)}
+.zone-panel #zone-description{font-size:12px;color:var(--texto);margin-top:12px;line-height:1.5}
+.sim-zone-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.sim-zone-btns .button{font-size:12px;font-weight:600;padding:6px 11px;border:1px solid var(--verde);color:var(--verde);background:#fff;border-radius:8px;cursor:pointer}
+.sim-zone-btns .button:hover{background:var(--verde);color:#fff}
+.reference-dot span{display:block;width:13px;height:13px;border-radius:50%;background:var(--verde);border:2px solid #fff;box-shadow:0 0 0 2px var(--verde)}
+.caption{font-size:11.5px;color:var(--texto-cl);margin-top:10px;line-height:1.5}
+.leaflet-container{font:inherit}
+
 /* ---------- FOOTER ---------- */
 footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 16px}
 .foot-in{max-width:1080px;margin:0 auto;text-align:center;font-size:12.5px;line-height:1.7}
@@ -188,6 +213,8 @@ footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 1
   .graf-grid{grid-template-columns:1fr}
   .reco{grid-template-columns:1fr}
   .alert-grid{grid-template-columns:1fr}
+  .sim-layout{grid-template-columns:1fr}
+  #map{height:360px}
   .zona-grid{grid-template-columns:repeat(5,1fr);gap:5px}
   .zona .zr{display:none}
   .inst-titles h1{font-size:17px}
@@ -233,6 +260,7 @@ footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 1
     <button class="tab active" data-tab="consulta"><span class="ic">📊</span><span class="txt">Consulta</span></button>
     <button class="tab" data-tab="anticipacion"><span class="ic">🎯</span><span class="txt">Anticipación</span></button>
     <button class="tab" data-tab="alertas"><span class="ic">🚨</span><span class="txt">Alertas</span></button>
+    <button class="tab" data-tab="simulacion"><span class="ic">🗺️</span><span class="txt">Simulación</span></button>
   </div>
 
   <!-- ============ CONSULTA ============ -->
@@ -351,6 +379,39 @@ footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 1
     </div>
   </section>
 
+  <!-- ============ SIMULACIÓN ============ -->
+  <section class="panel" id="simulacion">
+    <div class="sim-tag">🧪 <b>SIMULACIÓN · VISIÓN DEL PMV:</b>&nbsp;mapa de calor geográfico con 445 eventos ficticios. Ilustra cómo se vería la herramienta ideal; <b>no</b> corresponde a los 62 registros reales.</div>
+    <div class="card">
+      <h2><span class="dot"></span>Mapa de calor simulado · cómo se vería el PMV</h2>
+      <p class="hint">Prototipo del mapa geográfico de concentración. Usa las capas (calor / puntos / zonas) y toca una zona para ver su detalle. Datos de demostración.</p>
+      <div class="simulation-kpis">
+        <div><strong id="simulation-total">—</strong><span>eventos simulados cargados</span></div>
+        <div><strong id="simulation-zone-count">—</strong><span>zonas simuladas</span></div>
+      </div>
+      <p id="map-status" class="map-status" role="status">Cargando mapa simulado…</p>
+      <div class="sim-layout">
+        <div id="map" aria-label="Mapa simulado de 445 eventos en El Tintal, independiente de los registros reales" tabindex="0"></div>
+        <aside class="zone-panel" aria-live="polite">
+          <p class="eyebrow">Demostración · datos simulados</p>
+          <h3>Detalle de zona <span id="zone-id">—</span></h3>
+          <strong id="zone-count" class="zone-count">—</strong>
+          <p style="font-size:12px;color:var(--texto-cl);margin-top:2px">eventos ficticios en esta zona</p>
+          <dl>
+            <dt>Participación en los 445</dt><dd id="zone-share">—</dd>
+            <dt>Nivel del modelo</dt><dd id="zone-level">—</dd>
+            <dt>Índice del modelo</dt><dd id="zone-index">—</dd>
+          </dl>
+          <p id="zone-description">Selecciona una zona.</p>
+        </aside>
+      </div>
+      <div id="simulation-zones" class="sim-zone-btns"></div>
+      <p id="simulation-detail" class="caption"></p>
+      <button id="map-reset" class="btn-reset" type="button" disabled style="margin-top:12px">↺ Volver a El Tintal</button>
+      <p class="caption">Los puntos pueden superponerse al acercar. El total simulado es 445, independiente de los 62 registros reales. Referencias (CAI Tintal, Tintal Plaza, Biblioteca) son ubicaciones de contexto, no lugares de ocurrencia.</p>
+    </div>
+  </section>
+
 </div>
 
 <footer class="inst">
@@ -363,6 +424,10 @@ footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 1
   </div>
 </footer>
 
+<script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script defer src="leaflet-heat.js"></script>
+<script defer src="simulation-data.js"></script>
+<script defer src="map.js"></script>
 <script defer src="app.js"></script>
 </body>
 </html>
