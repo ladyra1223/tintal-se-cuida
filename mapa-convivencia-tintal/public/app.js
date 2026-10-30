@@ -198,16 +198,55 @@ function renderBandeja(){
   }).join('');
 }
 
-/* ================= TABS ================= */
+/* ================= ANIMACIÓN DE CONTEO (stats) ================= */
+function animCount(el){
+  const raw=(el.dataset.target||el.textContent).trim();
+  const m=raw.match(/^(\d+)(.*)$/);
+  if(!m){return;}
+  el.dataset.target=raw;
+  const target=+m[1], suffix=m[2], dur=1400, t0=performance.now();
+  el.textContent='0'+suffix;
+  function step(t){
+    const p=Math.min(1,(t-t0)/dur);
+    const e=1-Math.pow(1-p,3); // ease-out
+    el.textContent=Math.round(e*target)+suffix;
+    if(p<1)requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function initStats(){
+  const nums=$$('.stat .sn');
+  if(!('IntersectionObserver' in window)){nums.forEach(animCount);return;}
+  const obs=new IntersectionObserver((ents)=>{
+    ents.forEach(x=>{if(x.isIntersecting){animCount(x.target);obs.unobserve(x.target);}});
+  },{threshold:.5});
+  nums.forEach(el=>obs.observe(el));
+}
+
+/* ================= NAVEGACIÓN POR SECCIONES (sin recarga) ================= */
+const SECCIONES=['consulta','anticipacion','alertas','simulacion'];
 function mostrarTab(name){
-  $$('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
-  $$('.panel').forEach(p=>p.classList.toggle('active',p.id===name));
+  const home=!SECCIONES.includes(name);   // '', 'inicio' o desconocido => portada
+  $$('.tab').forEach(t=>t.classList.toggle('active',!home&&t.dataset.tab===name));
+  $$('.panel').forEach(p=>p.classList.toggle('active',!home&&p.id===name));
+  const port=document.getElementById('portada');
+  if(port)port.style.display=home?'':'none';
   window.scrollTo({top:0,behavior:'smooth'});
   if(name==='simulacion'){setTimeout(()=>{if(window.__initSimMap)window.__initSimMap();},80);}
 }
+function rutaActual(){return (location.hash||'').replace('#','');}
 function initTabs(){
-  $$('.tab').forEach(t=>t.addEventListener('click',()=>mostrarTab(t.dataset.tab)));
+  $$('.tab').forEach(t=>t.addEventListener('click',()=>{
+    const n=t.dataset.tab;
+    if(rutaActual()===n){mostrarTab(n);}
+    else{location.hash=n;}
+  }));
+  // escudo/nombre -> volver al inicio (portada)
+  const brand=document.querySelector('.inst-home');
+  if(brand)brand.addEventListener('click',()=>{if(rutaActual()==='inicio'||rutaActual()===''){mostrarTab('inicio');}else{location.hash='inicio';}});
+  window.addEventListener('hashchange',()=>mostrarTab(rutaActual()));
+  mostrarTab(rutaActual());
 }
 
 /* ================= INIT ================= */
-initTabs();initFiltros();render();initMapa();initAnticipacion();initAlertas();
+initTabs();initFiltros();render();initMapa();initAnticipacion();initAlertas();initStats();
