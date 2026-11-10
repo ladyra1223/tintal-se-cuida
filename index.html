@@ -157,7 +157,7 @@ select:focus,input:focus{outline:2px solid var(--verde2);outline-offset:-1px;bor
 .form-field{margin-bottom:12px}
 .form-field label{font-size:12.5px;font-weight:600;color:var(--texto);display:block;margin-bottom:5px}
 .nivel-pick{display:flex;gap:7px}
-.nivel-btn{flex:1;padding:9px 4px;border:2px solid var(--borde);border-radius:9px;background:#fff;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--texto-cl);transition:all .12s}
+.nivel-btn{flex:1;padding:9px 4px;border:2px solid var(--borde);border-radius:9px;background:#fff;cursor:pointer;font-size:12.5px;font-weight:700;color:var(--texto-cl);transition:all .12s;position:relative}.nivel-btn .tip{position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);width:185px;max-width:46vw;background:#14532D;color:#fff;font-size:11px;font-weight:500;line-height:1.4;text-align:left;padding:9px 11px;border-radius:9px;opacity:0;visibility:hidden;transition:opacity .15s;z-index:40;box-shadow:0 6px 18px rgba(0,0,0,.22);pointer-events:none}.nivel-btn .tip b{display:block;margin-bottom:2px;color:#C8A24B;font-size:10px;text-transform:uppercase;letter-spacing:.4px}.nivel-btn .tip::after{content:"";position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#14532D}.nivel-btn:hover .tip,.nivel-btn:focus .tip{opacity:1;visibility:visible}
 .nivel-btn[data-n=bajo].on{border-color:var(--r-bajo);background:#FEF9E7;color:#9a7a09}
 .nivel-btn[data-n=medio].on{border-color:var(--r-medio);background:#FFF2E8;color:#c2410c}
 .nivel-btn[data-n=alto].on{border-color:var(--r-alto);background:#FEECEC;color:#b91c1c}
@@ -401,9 +401,9 @@ footer.inst{background:var(--verde);color:#C9E3D1;margin-top:28px;padding:22px 1
         <div class="form-field">
           <label>Nivel</label>
           <div class="nivel-pick" id="nivelPick">
-            <button class="nivel-btn" data-n="bajo">Bajo</button>
-            <button class="nivel-btn" data-n="medio">Medio</button>
-            <button class="nivel-btn" data-n="alto">Alto</button>
+            <button class="nivel-btn" data-n="bajo">Bajo<span class="tip"><b>Bajo</b>Discusión o desacuerdo verbal, sin agresión física. Conviene vigilar por si escala.</span></button>
+            <button class="nivel-btn" data-n="medio">Medio<span class="tip"><b>Medio</b>Aglomeración, consumo problemático o forcejeos; riña sin armas.</span></button>
+            <button class="nivel-btn" data-n="alto">Alto<span class="tip"><b>Alto</b>Riña con armas (cortopunzantes o contundentes) o varias personas; riesgo de lesiones graves.</span></button>
           </div>
         </div>
         <button class="btn-enviar" id="btnEnviar" disabled>🚨 Enviar reporte</button>
